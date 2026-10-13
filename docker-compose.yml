@@ -1,0 +1,12 @@
+services:
+  floci:
+    image: floci/floci
+    ports:
+      - "127.0.0.1:${FLOCI_PORT-8000}:4566"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD-SHELL", "/usr/local/bin/healthcheck.sh"]
+      timeout: 1s
+      interval: 1s
+      retries: 10

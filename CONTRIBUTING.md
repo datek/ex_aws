@@ -90,9 +90,8 @@ Before opening a PR, please run `mix format` over your changes with a recent Eli
 ## Running Tests
 Running the test suite for ex_aws requires a few things:
 
-1. DynamoDB Local must be running
-  * May be downloaded from http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.DynamoDBLocal.html
-  * And may be executed with `java -Djava.library.path=/DynamoDBLocal_lib -jar DynamoDBLocal.jar -inMemory`
+1. Floci must be running
+  * Start it with `docker compose up -d --wait`
 2. Requires two environment variables `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`
   * These must be valid AWS credentials, the minimum IAM permissions required are:
 ```

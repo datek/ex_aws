@@ -1,6 +1,16 @@
 defmodule ExAwsTest do
   use ExUnit.Case, async: true
 
+  @endpoint_uri System.get_env("AWS_ENDPOINT_URL", "http://127.0.0.1:8000") |> URI.parse()
+
+  @config [
+    access_key_id: System.get_env("AWS_ACCESS_KEY_ID", "fake-id"),
+    secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY", "fake-key"),
+    scheme: "#{@endpoint_uri.scheme}://",
+    host: @endpoint_uri.host,
+    port: @endpoint_uri.port
+  ]
+
   # Skip until I figure out what the issue here is
   @tag :skip
   test "basic S3 operation works" do
@@ -18,6 +28,25 @@ defmodule ExAwsTest do
     }
 
     assert {:ok, %{body: _}} = ExAws.request(op)
+  end
+
+  test "nonexistent bucket" do
+    op = %ExAws.Operation.S3{
+      body: "",
+      bucket: "no-way",
+      headers: %{},
+      http_method: :head,
+      params: [],
+      parser: & &1,
+      path: "/",
+      resource: "",
+      service: :s3,
+      stream_builder: nil
+    }
+
+    {:error, {:http_error, status_code, _headers}} = ExAws.request(op, @config)
+
+    assert status_code == 404
   end
 
   test "basic json operation works" do
@@ -162,7 +191,7 @@ defmodule ExAwsTest do
                       request_body: "{}",
                       result: :error,
                       error:
-                        ~s({"__type":"com.amazon.coral.validate#ValidationException","Message":"Invalid table/index name.  Table/index names must be between 3 and 255 characters long, and may contain only the characters a-z, A-Z, 0-9, '_', '-', and '.'"})
+                        ~s({"__type":"ValidationException","message":"The parameter 'TableName' is required but was not present in the request"})
                     }}
   end
 end
